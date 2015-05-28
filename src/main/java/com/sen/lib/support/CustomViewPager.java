@@ -1,6 +1,7 @@
 package com.sen.lib.support;
 
 import android.content.Context;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -56,11 +57,18 @@ public class CustomViewPager extends ViewPager {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent arg0) {
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         if (!scrollAble) {
             return false;
         } else {
-            return super.onInterceptTouchEvent(arg0);
+            boolean result;
+            try {
+                result = super.onInterceptTouchEvent(ev);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                result = false;
+            }
+            return result;
         }
     }
 
@@ -71,6 +79,19 @@ public class CustomViewPager extends ViewPager {
             listenerList.clear();
         }
         listenerList = null;
+    }
+
+    public boolean checkInterceptTouchEvent(MotionEvent ev) {
+        if(ev.getAction() == MotionEvent.ACTION_CANCEL) {
+
+        }else if(ev.getAction() == MotionEventCompat.ACTION_POINTER_DOWN && super.onInterceptTouchEvent(ev)) {
+            return false;
+        }else if(ev.getAction() == MotionEventCompat.ACTION_POINTER_UP && super.onInterceptTouchEvent(ev)){
+            return false;
+        }else if(ev.getAction() == MotionEvent.ACTION_DOWN && super.onInterceptTouchEvent(ev)){
+            return false;
+        }
+        return super.onInterceptTouchEvent(ev);
     }
 
     private void setOnPageChangeListener() {
