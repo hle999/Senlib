@@ -164,6 +164,15 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
 
     }
 
+    public View getItemView(int index) {
+        if (getChildAt(0) instanceof ViewGroup) {
+            if (((ViewGroup) getChildAt(0)).getChildCount() > index) {
+                return ((ViewGroup) getChildAt(0)).getChildAt(index);
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onClick(View v) {
         if (v.getTag() instanceof Integer) {
@@ -207,7 +216,7 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         if (itemTabAdpater != null) {
-            itemTabAdpater.onScroll((ViewGroup) getChildAt(0), position, positionOffset);
+            itemTabAdpater.onScroll(position, positionOffset);
         }
         resetTab(positionOffset, position);
     }
@@ -221,6 +230,9 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
 
     @Override
     public void onPageScrollStateChanged(int state) {
+        if (itemTabAdpater != null) {
+            itemTabAdpater.onScrolledStateChange(state);
+        }
         /*if (ViewPager.SCROLL_STATE_IDLE == state) {
             this.direction = UNINVALUE;
         }*/

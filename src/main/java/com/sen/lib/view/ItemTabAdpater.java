@@ -11,7 +11,9 @@ public abstract class ItemTabAdpater {
 
     private HorizontalItemTab root;
 
-    public abstract void onScroll(ViewGroup container, int position, float positionOffset);
+    public abstract void onScroll(int position, float positionOffset);
+
+    public abstract void onScrolledStateChange(int state);
 
     public abstract View getView(View v, ViewGroup container, int postion, int selectIndex);
 
