@@ -5,12 +5,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+
+import java.util.ArrayList;
 
 /**
  * Created by Administrator on 15-4-21.
@@ -26,7 +31,8 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
 
     private float positionPercent = 0;
 
-    private Paint tabPaint = null;
+    private Paint mTabPaint = null;
+    private LinearGroup mLinearGroup = null;
 
     public int getSelectItemIndex() {
         return selectItemIndex;
@@ -69,8 +75,8 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
     }
 
     public void setTabColor(int color) {
-        if (tabPaint != null) {
-            tabPaint.setColor(color);
+        if (mTabPaint != null) {
+            mTabPaint.setColor(color);
         }
     }
 
@@ -92,14 +98,15 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
         setFillViewport(true);
         setWillNotDraw(false);
 
-        tabPaint = new Paint();
-        tabPaint.setColor(Color.BLACK);
+        mTabPaint = new Paint();
+        mTabPaint.setColor(Color.BLACK);
 
-        LinearLayout linearLayout = new LinearLayout(context);
-        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        mLinearGroup = new LinearGroup(context);
+//        LinearLayout linearLayout = new LinearLayout(context);
+//        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
-        addView(linearLayout, layoutParams);
+        addView(mLinearGroup, layoutParams);
 
     }
 
@@ -113,22 +120,40 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
     }
 
     protected void reset() {
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
-        if (viewGroup != null) {
+        if (mLinearGroup != null) {
             if (itemTabAdpater != null) {
                 itemTabAdpater.setRoot(this);
                 if (getTag() != itemTabAdpater.toString()) {
+                    int totalWidth = 0;
+                    int leaveWidth = getMeasuredWidth();
+                    int maxHeight = 0;
                     for (int i = 0; i < itemTabAdpater.getCount(); i++) {
-                        addItem(itemTabAdpater.getView(null, viewGroup, i, 0));
+                        View itemView = itemTabAdpater.getView(null, mLinearGroup, i, 0);
+                        itemView.measure(getChildAt(0).getMeasuredWidth(), getChildAt(0).getMeasuredHeight());
+                        totalWidth += itemView.getMeasuredWidth();
+                        if (itemView.getMeasuredHeight() > maxHeight) {
+                            maxHeight = itemView.getMeasuredHeight();
+                        }
+                        if (leaveWidth > 0) {
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                        }
+                        leaveWidth -= itemView.getMeasuredWidth();
+                        /*if (senRecycledViewPool.poolSize(SenRecycledViewPool.DEFAULT_VIEW_TYPE) > i) {
+                            senRecycledViewPool.putRecycledView(SenRecycledViewPool.DEFAULT_VIEW_TYPE, itemTabAdpater.getView(null, viewGroup, i, 0));
+                        }*/
                     }
+                    mLinearGroup.reset(totalWidth, maxHeight);
+                    mLinearGroup.requestLayout();
                     setTag(itemTabAdpater.toString());
                 } else {
                     for (int i = 0; i < itemTabAdpater.getCount(); i++) {
-                        View childView = viewGroup.getChildAt(i);
-                        if (childView != null) {
-                            itemTabAdpater.getView(childView, viewGroup, i, getSelectItemIndex());
+                        View itemView = mLinearGroup.getChildAt(i);
+//                        View childView = senRecycledViewPool.getRecycledView(SenRecycledViewPool.DEFAULT_VIEW_TYPE);
+                        if (itemView != null) {
+                            itemTabAdpater.getView(itemView, mLinearGroup, i, getSelectItemIndex());
                         } else {
-                            addItem(itemTabAdpater.getView(childView, viewGroup, i, getSelectItemIndex()));
+//                            addItem(itemTabAdpater.getView(itemView, mLinearGroup, i, getSelectItemIndex()));
                         }
                     }
                 }
@@ -140,6 +165,13 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
         ViewGroup viewGroup = (ViewGroup) getChildAt(0);
         if (viewGroup != null && item != null) {
             viewGroup.addView(item);
+        }
+    }
+
+    public void removeItem(View item) {
+        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
+        if (viewGroup != null && item != null) {
+            viewGroup.removeView(item);
         }
     }
 
@@ -208,7 +240,7 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
                 currentLeft = currentLeft + (nextLeft - currentLeft) * positionPercent;
                 currentRight = currentRight + (nextRight - currentRight) * positionPercent;
             }
-            canvas.drawRect(currentLeft, getHeight() - tabHeight, currentRight, getHeight(), tabPaint);
+            canvas.drawRect(currentLeft, getHeight() - tabHeight, currentRight, getHeight(), mTabPaint);
 
         }
     }
