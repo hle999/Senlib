@@ -13,14 +13,44 @@ import java.util.List;
  */
 public class LinearGroup extends ViewGroup {
 
-    private int width;
-    private int height;
+    public static final int VERTICAL = 0x01;
+    public static final int HORIZONTAL = 0x02;
 
-    private List<Integer> mCacheWidthArray;
+    private int orientation = HORIZONTAL;
+    private int mCacheWidth;
+    private int mCacheHeight;
+    private int increaseNum;
+
+    private List<Integer> mCacheXArray;
     private List<CacheViewInfo> mCacheViewInfoArray;
+    
+    public int getIncreaseNum() {
+        return increaseNum;
+    }
+
+    public void setIncreaseNum(int increaseNum) {
+        this.increaseNum = increaseNum;
+    }
+
+    public int getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(int orientation) {
+        this.orientation = orientation;
+    }
+
+    public int getCacheWidth() {
+        return mCacheWidth;
+    }
+
+    public int getCacheHeight() {
+        return mCacheHeight;
+    }
 
     public LinearGroup(Context context) {
         super(context);
+        init();
     }
 
     public LinearGroup(Context context, AttributeSet attrs) {
@@ -33,17 +63,23 @@ public class LinearGroup extends ViewGroup {
     }
 
     private void init() {
-        mCacheWidthArray = new ArrayList<Integer>();
+        mCacheXArray = new ArrayList<Integer>();
         mCacheViewInfoArray = new ArrayList<CacheViewInfo>();
     }
 
     public void reset(int width, int height) {
-        this.width = width;
-        this.height = height;
+        this.mCacheWidth = width + getPaddingLeft() + getPaddingRight();
+        this.mCacheHeight = height + getPaddingTop() + getPaddingBottom();
     }
 
     public void addCacheViewInfo(int index, View view) {
-        mCacheViewInfoArray.add(new CacheViewInfo(index, view));
+        CacheViewInfo cacheViewInfo = new CacheViewInfo(index, view);
+        cacheViewInfo.needMeasured = false;
+        mCacheViewInfoArray.add(cacheViewInfo);
+    }
+
+    public void addCacheToLocal(int local) {
+        mCacheXArray.add(local);
     }
 
     public CacheViewInfo getCacheViewInfo(View view) {
@@ -55,40 +91,37 @@ public class LinearGroup extends ViewGroup {
         return null;
     }
 
+    public List<Integer> getCacheLocalArray() {
+        if (mCacheXArray != null) {
+            return mCacheXArray;
+        }
+        return null;
+    }
+
+    public List<CacheViewInfo> getCacheViewInfoArray() {
+        if (mCacheViewInfoArray != null) {
+            return mCacheViewInfoArray;
+        }
+        return null;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (width == 0) {
+        if (mCacheWidth == 0) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         } else {
-            setMeasuredDimension(width,
-                    resolveSizeAndState(height, heightMeasureSpec, 0));
+            setMeasuredDimension(mCacheWidth,
+                    resolveSizeAndState(mCacheHeight, heightMeasureSpec, 0));
         }
 
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        int totalWidth = 0 + getPaddingLeft();
-        /*for (int i = 0;i < getChildCount(); i++){
-            View view = getChildAt(i);
-            if (view.getMeasuredWidth() == 0) {
-                view.measure(getMeasuredWidth(), getMeasuredHeight());
-            }
-            int right = totalWidth + view.getMeasuredWidth();
-            view.layout(totalWidth, getPaddingTop(),
-                    right, getPaddingTop() + view.getMeasuredHeight());
-            totalWidth = right;
-        }*/
         for (CacheViewInfo cacheViewInfo : mCacheViewInfoArray) {
             if (cacheViewInfo.view != null) {
-                if (cacheViewInfo.view.getMeasuredWidth() == 0) {
-                    cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
-                }
-                if (mCacheViewInfoArray.size() > cacheViewInfo.index) {
-                    int left = getPaddingLeft()+mCacheWidthArray.get(cacheViewInfo.index);
-                    cacheViewInfo.view.layout(left, getPaddingTop(),
-                            left + cacheViewInfo.view.getMeasuredWidth(),
-                            getPaddingTop() + cacheViewInfo.view.getMeasuredHeight());
+                if (mCacheXArray.size() > cacheViewInfo.index) {
+                    linearLayout(cacheViewInfo, mCacheXArray.get(cacheViewInfo.index));
                 }
             }
         }
@@ -100,12 +133,46 @@ public class LinearGroup extends ViewGroup {
         clear();
     }
 
+    public void linearLayout(CacheViewInfo cacheViewInfo, int local) {
+        if (orientation == VERTICAL) {
+            verticalLinearLayout(cacheViewInfo, local);
+        } else {
+            horizontalLinearLayout(cacheViewInfo, local);
+        }
+    }
+
+    private void horizontalLinearLayout(CacheViewInfo cacheViewInfo, int x) {
+        if (cacheViewInfo != null) {
+            if (cacheViewInfo.needMeasured) {
+                cacheViewInfo.needMeasured = false;
+                cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
+            }
+            x = getPaddingLeft() + x;
+            cacheViewInfo.view.layout(x, getPaddingTop(),
+                    x + cacheViewInfo.view.getMeasuredWidth(),
+                    getPaddingTop() + cacheViewInfo.view.getMeasuredHeight());
+        }
+    }
+
+    private void verticalLinearLayout(CacheViewInfo cacheViewInfo, int y) {
+        if (cacheViewInfo != null) {
+            if (cacheViewInfo.needMeasured) {
+                cacheViewInfo.needMeasured = false;
+                cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
+            }
+            y = getPaddingTop() + y;
+            cacheViewInfo.view.layout(getPaddingLeft(), y,
+                    getPaddingLeft() + cacheViewInfo.view.getMeasuredWidth(),
+                    y + cacheViewInfo.view.getMeasuredHeight());
+        }
+    }
+
     private void clear() {
         if (mCacheViewInfoArray != null) {
             mCacheViewInfoArray.clear();
         }
-        if (mCacheWidthArray != null) {
-            mCacheWidthArray.clear();
+        if (mCacheXArray != null) {
+            mCacheXArray.clear();
         }
     }
 
@@ -134,6 +201,7 @@ public class LinearGroup extends ViewGroup {
     public class CacheViewInfo {
         public int index;
         public View view;
+        protected boolean needMeasured = false;
 
         public CacheViewInfo(int index, View view) {
             this.index = index;

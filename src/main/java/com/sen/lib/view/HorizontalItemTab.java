@@ -5,57 +5,38 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
-
-import java.util.ArrayList;
 
 /**
  * Created by Administrator on 15-4-21.
  */
-public class HorizontalItemTab extends HorizontalScrollView implements View.OnClickListener, ViewPager.OnPageChangeListener {
-
-    private static final int UNINVALUE = -1;
+public class HorizontalItemTab extends HorizontalScrollWidget implements View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private int tabHeight = 2;
-    private int tabIndex = 0;
-    private int tabWidth = 0;
-    private int selectItemIndex = 0;
+    private int tabIndex;
+    private int tabWidth;
+    private int selectItemIndex;
+    private float positionPercent;
 
-    private float positionPercent = 0;
-
-    private Paint mTabPaint = null;
-    private LinearGroup mLinearGroup = null;
+    private Paint mTabPaint;
 
     public int getSelectItemIndex() {
         return selectItemIndex;
     }
 
     private void setSelectItemIndex(int selectItemIndex) {
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
-        if (itemTabAdpater != null && viewGroup != null && viewGroup.getChildCount() > selectItemIndex) {
-            itemTabAdpater.getView(viewGroup.getChildAt(getSelectItemIndex()), viewGroup, getSelectItemIndex(), selectItemIndex);
-            itemTabAdpater.getView(viewGroup.getChildAt(selectItemIndex), viewGroup, selectItemIndex, selectItemIndex);
+        LinearGroup mLinearGroup = (LinearGroup)getItemGroup();
+        HorizontalItemTabAdapter horizontalItemTabAdapter = (HorizontalItemTabAdapter)getAdpater();
+        if (horizontalItemTabAdapter != null && mLinearGroup != null && mLinearGroup.getCacheLocalArray().size() > selectItemIndex) {
+            horizontalItemTabAdapter.getView(getItemView(getSelectItemIndex()),
+                    mLinearGroup, getSelectItemIndex());
+            horizontalItemTabAdapter.getView(getItemView(selectItemIndex),
+                    mLinearGroup, selectItemIndex);
         }
         this.selectItemIndex = selectItemIndex;
-    }
-
-    private ItemTabAdpater itemTabAdpater;
-
-    public ItemTabAdpater getAdpater() {
-        return itemTabAdpater;
-    }
-
-    public void setAdpater(ItemTabAdpater itemTabAdpater) {
-        this.itemTabAdpater = itemTabAdpater;
-        reset();
     }
 
     public int getTabHeight() {
@@ -100,14 +81,7 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
 
         mTabPaint = new Paint();
         mTabPaint.setColor(Color.BLACK);
-
-        mLinearGroup = new LinearGroup(context);
-//        LinearLayout linearLayout = new LinearLayout(context);
-//        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        addView(mLinearGroup, layoutParams);
-
+        disableTouchScroll();
     }
 
     public void disableTouchScroll() {
@@ -119,90 +93,42 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
         });
     }
 
-    protected void reset() {
-        if (mLinearGroup != null) {
-            if (itemTabAdpater != null) {
-                itemTabAdpater.setRoot(this);
-                if (getTag() != itemTabAdpater.toString()) {
-                    int totalWidth = 0;
-                    int leaveWidth = getMeasuredWidth();
-                    int maxHeight = 0;
-                    for (int i = 0; i < itemTabAdpater.getCount(); i++) {
-                        View itemView = itemTabAdpater.getView(null, mLinearGroup, i, 0);
-                        itemView.measure(getChildAt(0).getMeasuredWidth(), getChildAt(0).getMeasuredHeight());
-                        totalWidth += itemView.getMeasuredWidth();
-                        if (itemView.getMeasuredHeight() > maxHeight) {
-                            maxHeight = itemView.getMeasuredHeight();
-                        }
-                        if (leaveWidth > 0) {
-                            mLinearGroup.addCacheViewInfo(i, itemView);
-                            addItem(itemView);
-                        }
-                        leaveWidth -= itemView.getMeasuredWidth();
-                        /*if (senRecycledViewPool.poolSize(SenRecycledViewPool.DEFAULT_VIEW_TYPE) > i) {
-                            senRecycledViewPool.putRecycledView(SenRecycledViewPool.DEFAULT_VIEW_TYPE, itemTabAdpater.getView(null, viewGroup, i, 0));
-                        }*/
-                    }
-                    mLinearGroup.reset(totalWidth, maxHeight);
-                    mLinearGroup.requestLayout();
-                    setTag(itemTabAdpater.toString());
-                } else {
-                    for (int i = 0; i < itemTabAdpater.getCount(); i++) {
-                        View itemView = mLinearGroup.getChildAt(i);
-//                        View childView = senRecycledViewPool.getRecycledView(SenRecycledViewPool.DEFAULT_VIEW_TYPE);
-                        if (itemView != null) {
-                            itemTabAdpater.getView(itemView, mLinearGroup, i, getSelectItemIndex());
-                        } else {
-//                            addItem(itemTabAdpater.getView(itemView, mLinearGroup, i, getSelectItemIndex()));
-                        }
+    public void scrollTab(float positionPercent, int tabIndex) {
+        this.positionPercent = positionPercent;
+        this.tabIndex = tabIndex;
+        LinearGroup mLinearGroup = (LinearGroup)getItemGroup();
+        if (mLinearGroup != null && mLinearGroup.getCacheLocalArray() != null && mLinearGroup.getCacheLocalArray().size() > tabIndex) {
+            int currentLeft = mLinearGroup.getCacheLocalArray().get(tabIndex);
+            int currentWidth = 0;
+            if (mLinearGroup.getCacheViewInfoArray() != null) {
+                for (LinearGroup.CacheViewInfo cacheViewInfo : mLinearGroup.getCacheViewInfoArray()) {
+                    if (cacheViewInfo.index == tabIndex) {
+                        currentWidth = cacheViewInfo.view.getMeasuredWidth();
+                        break;
                     }
                 }
             }
-        }
-    }
-
-    private void addItem(View item) {
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
-        if (viewGroup != null && item != null) {
-            viewGroup.addView(item);
-        }
-    }
-
-    public void removeItem(View item) {
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
-        if (viewGroup != null && item != null) {
-            viewGroup.removeView(item);
-        }
-    }
-
-    public void clearAllItems() {
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
-        if (viewGroup != null) {
-            viewGroup.removeAllViews();
-        }
-    }
-
-    public void resetTab(float positionPercent, int tabIndex) {
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
-        if (viewGroup != null && tabIndex > 0 && (viewGroup.getChildCount() - 1) > tabIndex) {
-            View currentItem = viewGroup.getChildAt(tabIndex - 1);
-            float currentLeft = currentItem.getLeft();
-            float currentWidth = currentItem.getWidth();
-            scrollTo((int) (currentLeft + currentWidth * positionPercent), 0);
-        }
-        this.positionPercent = positionPercent;
-        this.tabIndex = tabIndex;
-        invalidate();
-
-    }
-
-    public View getItemView(int index) {
-        if (getChildAt(0) instanceof ViewGroup) {
-            if (((ViewGroup) getChildAt(0)).getChildCount() > index) {
-                return ((ViewGroup) getChildAt(0)).getChildAt(index);
+            if (currentWidth != 0) {
+                scrollTo((int) (currentLeft + currentWidth * positionPercent), 0);
             }
         }
-        return null;
+    }
+
+    @Override
+    protected void resetSize() {
+        super.resetSize();
+        if (getItemGroup() instanceof LinearGroup) {
+            final int currentIndexX = ((LinearGroup)getItemGroup()).getCacheLocalArray().get(selectItemIndex);
+            if (currentIndexX != getScrollX()) {
+                getItemGroup().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        HorizontalItemTab.this.smoothScrollBy(currentIndexX - getScrollX(), 0);
+                    }
+                });
+
+            }
+        }
     }
 
     @Override
@@ -247,10 +173,11 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        if (itemTabAdpater != null) {
-            itemTabAdpater.onScroll(position, positionOffset);
+        HorizontalItemTabAdapter horizontalItemTabAdapter = (HorizontalItemTabAdapter)getAdpater();
+        if (horizontalItemTabAdapter != null) {
+            horizontalItemTabAdapter.onScroll(position, positionOffset);
         }
-        resetTab(positionOffset, position);
+        scrollTab(positionOffset, position);
     }
 
     @Override
@@ -262,8 +189,9 @@ public class HorizontalItemTab extends HorizontalScrollView implements View.OnCl
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        if (itemTabAdpater != null) {
-            itemTabAdpater.onScrolledStateChange(state);
+        HorizontalItemTabAdapter horizontalItemTabAdapter = (HorizontalItemTabAdapter)getAdpater();
+        if (horizontalItemTabAdapter != null) {
+            horizontalItemTabAdapter.onScrolledStateChange(state);
         }
         /*if (ViewPager.SCROLL_STATE_IDLE == state) {
             this.direction = UNINVALUE;

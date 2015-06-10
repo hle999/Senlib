@@ -7,25 +7,24 @@ import android.view.ViewGroup;
  * Created by Administrator on 15-4-20.
  */
 
-public abstract class ItemTabAdpater {
+public abstract class HorizontalItemTabAdapter extends BaseItemAdapter{
 
-    private HorizontalItemTab root;
+    private HorizontalScrollWidget root;
 
     public abstract void onScroll(int position, float positionOffset);
 
     public abstract void onScrolledStateChange(int state);
 
-    public abstract View getView(View v, ViewGroup container, int postion, int selectIndex);
-
-    public abstract int getCount();
-
-    public void setRoot(HorizontalItemTab root) {
-        this.root = root;
+    @Override
+    public void setRoot(View root) {
+        if (root instanceof HorizontalScrollWidget) {
+            this.root = (HorizontalScrollWidget)root;
+        }
     }
 
     public void notifyDataChange() {
         if (root != null) {
-            root.reset();
+            root.notifyDataChange();
         }
     }
 }
