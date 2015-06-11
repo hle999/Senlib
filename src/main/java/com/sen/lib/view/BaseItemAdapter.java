@@ -9,11 +9,19 @@ import android.widget.BaseAdapter;
  */
 public abstract class BaseItemAdapter {
 
+    private IWidgetBean root;
+
     public abstract View getView(View v, ViewGroup container, int postion);
 
     public abstract int getCount();
 
-    public abstract void notifyDataChange();
+    public void notifyDataChange() {
+        if (root != null) {
+            root.notifyDataChange();
+        }
+    }
 
-    public abstract void setRoot(View root);
+    public void setRoot(IWidgetBean root) {
+        this.root = root;
+    }
 }

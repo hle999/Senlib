@@ -23,7 +23,7 @@ public class LinearGroup extends ViewGroup {
 
     private List<Integer> mCacheXArray;
     private List<CacheViewInfo> mCacheViewInfoArray;
-    
+
     public int getIncreaseNum() {
         return increaseNum;
     }

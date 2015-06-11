@@ -81,7 +81,7 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
 
         mTabPaint = new Paint();
         mTabPaint.setColor(Color.BLACK);
-        disableTouchScroll();
+//        disableTouchScroll();
     }
 
     public void disableTouchScroll() {
@@ -115,8 +115,7 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
     }
 
     @Override
-    protected void resetSize() {
-        super.resetSize();
+    public void onResetSize() {
         if (getItemGroup() instanceof LinearGroup) {
             final int currentIndexX = ((LinearGroup)getItemGroup()).getCacheLocalArray().get(selectItemIndex);
             if (currentIndexX != getScrollX()) {
@@ -193,8 +192,5 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
         if (horizontalItemTabAdapter != null) {
             horizontalItemTabAdapter.onScrolledStateChange(state);
         }
-        /*if (ViewPager.SCROLL_STATE_IDLE == state) {
-            this.direction = UNINVALUE;
-        }*/
     }
 }

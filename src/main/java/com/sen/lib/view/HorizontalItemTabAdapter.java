@@ -9,22 +9,9 @@ import android.view.ViewGroup;
 
 public abstract class HorizontalItemTabAdapter extends BaseItemAdapter{
 
-    private HorizontalScrollWidget root;
-
     public abstract void onScroll(int position, float positionOffset);
 
     public abstract void onScrolledStateChange(int state);
 
-    @Override
-    public void setRoot(View root) {
-        if (root instanceof HorizontalScrollWidget) {
-            this.root = (HorizontalScrollWidget)root;
-        }
-    }
 
-    public void notifyDataChange() {
-        if (root != null) {
-            root.notifyDataChange();
-        }
-    }
 }

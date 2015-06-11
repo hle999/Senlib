@@ -4,26 +4,24 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
-
-import java.util.List;
+import android.widget.ScrollView;
 
 /**
- * Created by Sen on 2015/6/10.
+ * Created by Sen on 2015/6/11.
  */
-public class HorizontalScrollWidget extends HorizontalScrollView implements LinearManager.OnLinearManagerListener, IWidgetBean{
+public class VerticalScrollWidget extends ScrollView implements LinearManager.OnLinearManagerListener, IWidgetBean {
 
     private LinearManager linearManager;
 
-    public HorizontalScrollWidget(Context context) {
+    public VerticalScrollWidget(Context context) {
         super(context);
     }
 
-    public HorizontalScrollWidget(Context context, AttributeSet attrs) {
+    public VerticalScrollWidget(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public HorizontalScrollWidget(Context context, AttributeSet attrs, int defStyle) {
+    public VerticalScrollWidget(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -56,7 +54,7 @@ public class HorizontalScrollWidget extends HorizontalScrollView implements Line
     }
 
     private void init() {
-        linearManager = new LinearManager(this, LinearGroup.HORIZONTAL);
+        linearManager = new LinearManager(this, LinearGroup.VERTICAL);
         linearManager.setOnLinearManagerListener(this);
     }
 
