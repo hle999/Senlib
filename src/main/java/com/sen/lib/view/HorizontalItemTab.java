@@ -72,16 +72,16 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
 
     public HorizontalItemTab(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
+    private void init() {
         setFillViewport(true);
         setWillNotDraw(false);
 
         mTabPaint = new Paint();
         mTabPaint.setColor(Color.BLACK);
-//        disableTouchScroll();
+        disableTouchScroll();
     }
 
     public void disableTouchScroll() {
