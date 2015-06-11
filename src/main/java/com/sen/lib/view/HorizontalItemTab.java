@@ -29,11 +29,11 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
 
     private void setSelectItemIndex(int selectItemIndex) {
         LinearGroup mLinearGroup = (LinearGroup)getItemGroup();
-        HorizontalItemTabAdapter horizontalItemTabAdapter = (HorizontalItemTabAdapter)getAdpater();
-        if (horizontalItemTabAdapter != null && mLinearGroup != null && mLinearGroup.getCacheLocalArray().size() > selectItemIndex) {
-            horizontalItemTabAdapter.getView(getItemView(getSelectItemIndex()),
+        ItemTabAdapter itemTabAdapter = (ItemTabAdapter)getAdpater();
+        if (itemTabAdapter != null && mLinearGroup != null && mLinearGroup.getCacheLocalArray().size() > selectItemIndex) {
+            itemTabAdapter.getView(getItemView(getSelectItemIndex()),
                     mLinearGroup, getSelectItemIndex());
-            horizontalItemTabAdapter.getView(getItemView(selectItemIndex),
+            itemTabAdapter.getView(getItemView(selectItemIndex),
                     mLinearGroup, selectItemIndex);
         }
         this.selectItemIndex = selectItemIndex;
@@ -172,9 +172,9 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        HorizontalItemTabAdapter horizontalItemTabAdapter = (HorizontalItemTabAdapter)getAdpater();
-        if (horizontalItemTabAdapter != null) {
-            horizontalItemTabAdapter.onScroll(position, positionOffset);
+        ItemTabAdapter itemTabAdapter = (ItemTabAdapter)getAdpater();
+        if (itemTabAdapter != null) {
+            itemTabAdapter.onScroll(position, positionOffset);
         }
         scrollTab(positionOffset, position);
     }
@@ -188,9 +188,9 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
 
     @Override
     public void onPageScrollStateChanged(int state) {
-        HorizontalItemTabAdapter horizontalItemTabAdapter = (HorizontalItemTabAdapter)getAdpater();
-        if (horizontalItemTabAdapter != null) {
-            horizontalItemTabAdapter.onScrolledStateChange(state);
+        ItemTabAdapter itemTabAdapter = (ItemTabAdapter)getAdpater();
+        if (itemTabAdapter != null) {
+            itemTabAdapter.onScrolledStateChange(state);
         }
     }
 }

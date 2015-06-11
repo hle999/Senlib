@@ -7,7 +7,7 @@ import android.view.ViewGroup;
  * Created by Administrator on 15-4-20.
  */
 
-public abstract class HorizontalItemTabAdapter extends BaseItemAdapter{
+public abstract class ItemTabAdapter extends BaseItemAdapter{
 
     public abstract void onScroll(int position, float positionOffset);
 
