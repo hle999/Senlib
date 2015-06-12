@@ -317,13 +317,16 @@ class LinearManager {
         if (mLinearGroup != null && mLinearGroup.getCacheLocalArray() != null) {
             List<Integer> cacheLocalArray = mLinearGroup.getCacheLocalArray();
             int index = UN_INVALUE;
-            for (Integer l : cacheLocalArray) {
-                if (local >= l) {
-                    index = cacheLocalArray.indexOf(l);
+            if (local > 0) {
+                for (Integer l : cacheLocalArray) {
+                    if (local >= l) {
+                        index = cacheLocalArray.indexOf(l);
+                    }
                 }
+            } else {
+                index = 0;
             }
             if (index != UN_INVALUE) {
-                index--;
                 if (mLinearGroup != null && cacheLocalArray != null
                         && cacheLocalArray.size() > index && index >= 0) {
                     LinearGroup.CacheViewInfo firstCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(0);
