@@ -21,6 +21,12 @@ public abstract class BaseItemAdapter {
         }
     }
 
+    public void notifyDataAll() {
+        if (root != null) {
+            root.notifyDataAll();
+        }
+    }
+
     public void setRoot(IWidgetBean root) {
         this.root = root;
     }

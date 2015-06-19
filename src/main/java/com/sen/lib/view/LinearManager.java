@@ -97,39 +97,134 @@ class LinearManager {
         }
     }
 
+    protected void notifyDataChange() {
+        if (mLinearGroup != null) {
+            if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
+                if (((View)mLinearGroup.getParent()).getHeight() == 0) {
+                    mLinearGroup.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            resetVerticalSize();
+                        }
+                    });
+                } else {
+                    resetVerticalSize();
+                }
+            } else {
+                if (((View)mLinearGroup.getParent()).getWidth() == 0) {
+                    mLinearGroup.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            resetHorizontalSize();
+                        }
+                    });
+                } else {
+                    resetHorizontalSize();
+                }
+            }
+        }
+    }
+
+    protected void notifyDataAll() {
+        if (mLinearGroup != null) {
+            if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
+                if (((View)mLinearGroup.getParent()).getHeight() == 0) {
+                    mLinearGroup.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            resetVerticalAllSize();
+                        }
+                    });
+                } else {
+                    resetVerticalAllSize();
+                }
+            } else {
+                if (((View)mLinearGroup.getParent()).getWidth() == 0) {
+                    mLinearGroup.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            resetHorizontalAllSize();
+                        }
+                    });
+                } else {
+                    resetHorizontalAllSize();
+                }
+            }
+        }
+    }
+
+    private void resetHorizontalAllSize() {
+        if (mLinearGroup != null && adapter != null) {
+            int x = 0;
+            int leaveWidth = ((View)mLinearGroup.getParent()).getWidth();
+            int maxHeight = 0;
+            mLinearGroup.removeAllViews();
+            mLinearGroup.setIncreaseNum(MAX_INCREASE_NUM);
+            for (int i = 0; i < adapter.getCount(); i++) {
+                View itemView = adapter.getView(null, mLinearGroup, i);
+                itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                if (itemView.getMeasuredHeight() > maxHeight) {
+                    maxHeight = itemView.getMeasuredHeight();
+                }
+                if (leaveWidth > 0) {
+                    mLinearGroup.addCacheViewInfo(i, itemView);
+                    addItem(itemView);
+                } else {
+                    if (mLinearGroup.getIncreaseNum() > 0) {
+                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                        mLinearGroup.addCacheViewInfo(i, itemView);
+                        addItem(itemView);
+                    }
+                }
+                mLinearGroup.addCacheToLocal(x);
+                leaveWidth -= itemView.getMeasuredWidth();
+                x += itemView.getMeasuredWidth();
+            }
+            mLinearGroup.reset(x, maxHeight);
+            mLinearGroup.requestLayout();
+        }
+    }
+
+    private void resetVerticalAllSize() {
+        if (mLinearGroup != null && adapter != null) {
+            int y = 0;
+            int leaveHeight = ((View)mLinearGroup.getParent()).getHeight();
+            int maxWidth = 0;
+            mLinearGroup.removeAllViews();
+            mLinearGroup.setIncreaseNum(MAX_INCREASE_NUM);
+            for (int i = 0; i < adapter.getCount(); i++) {
+                View itemView = adapter.getView(null, mLinearGroup, i);
+                itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                if (itemView.getMeasuredWidth() > maxWidth) {
+                    maxWidth = itemView.getMeasuredWidth();
+                }
+                if (leaveHeight > 0) {
+                    mLinearGroup.addCacheViewInfo(i, itemView);
+                    addItem(itemView);
+                } else {
+                    if (mLinearGroup.getIncreaseNum() > 0) {
+                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                        mLinearGroup.addCacheViewInfo(i, itemView);
+                        addItem(itemView);
+                    }
+                }
+                mLinearGroup.addCacheToLocal(y);
+                leaveHeight -= itemView.getMeasuredHeight();
+                y += itemView.getMeasuredHeight();
+            }
+            mLinearGroup.reset(maxWidth, y);
+            mLinearGroup.requestLayout();
+        }
+    }
+
     private void resetHorizontalSize() {
         if (mLinearGroup != null) {
             if (adapter != null) {
                 adapter.setRoot((IWidgetBean)mLinearGroup.getParent());
-                if (lastAdapter != adapter) {
+                if (lastAdapter != adapter || mLinearGroup.getCacheLocalArray() != null
+                        && mLinearGroup.getCacheLocalArray().size() == 0) {
                     lastAdapter = adapter;
-                    int x = 0;
-                    int leaveWidth = ((View)mLinearGroup.getParent()).getWidth();
-                    int maxHeight = 0;
-                    mLinearGroup.removeAllViews();
-                    mLinearGroup.setIncreaseNum(MAX_INCREASE_NUM);
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        View itemView = adapter.getView(null, mLinearGroup, i);
-                        itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
-                        if (itemView.getMeasuredHeight() > maxHeight) {
-                            maxHeight = itemView.getMeasuredHeight();
-                        }
-                        if (leaveWidth > 0) {
-                            mLinearGroup.addCacheViewInfo(i, itemView);
-                            addItem(itemView);
-                        } else {
-                            if (mLinearGroup.getIncreaseNum() > 0) {
-                                mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
-                                mLinearGroup.addCacheViewInfo(i, itemView);
-                                addItem(itemView);
-                            }
-                        }
-                        mLinearGroup.addCacheToLocal(x);
-                        leaveWidth -= itemView.getMeasuredWidth();
-                        x += itemView.getMeasuredWidth();
-                    }
-                    mLinearGroup.reset(x, maxHeight);
-                    mLinearGroup.requestLayout();
+                    resetHorizontalAllSize();
                 } else {
                     int x = 0;
                     int leaveWidth = ((View)mLinearGroup.getParent()).getWidth();
@@ -178,35 +273,10 @@ class LinearManager {
         if (mLinearGroup != null) {
             if (adapter != null) {
                 adapter.setRoot((IWidgetBean)mLinearGroup.getParent());
-                if (lastAdapter != adapter) {
+                if (lastAdapter != adapter || mLinearGroup.getCacheLocalArray() != null
+                        && mLinearGroup.getCacheLocalArray().size() == 0) {
                     lastAdapter = adapter;
-                    int y = 0;
-                    int leaveHeight = ((View)mLinearGroup.getParent()).getHeight();
-                    int maxWidth = 0;
-                    mLinearGroup.removeAllViews();
-                    mLinearGroup.setIncreaseNum(MAX_INCREASE_NUM);
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        View itemView = adapter.getView(null, mLinearGroup, i);
-                        itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
-                        if (itemView.getMeasuredWidth() > maxWidth) {
-                            maxWidth = itemView.getMeasuredWidth();
-                        }
-                        if (leaveHeight > 0) {
-                            mLinearGroup.addCacheViewInfo(i, itemView);
-                            addItem(itemView);
-                        } else {
-                            if (mLinearGroup.getIncreaseNum() > 0) {
-                                mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
-                                mLinearGroup.addCacheViewInfo(i, itemView);
-                                addItem(itemView);
-                            }
-                        }
-                        mLinearGroup.addCacheToLocal(y);
-                        leaveHeight -= itemView.getMeasuredHeight();
-                        y += itemView.getMeasuredHeight();
-                    }
-                    mLinearGroup.reset(maxWidth, y);
-                    mLinearGroup.requestLayout();
+                    resetVerticalAllSize();
                 } else {
                     int y = 0;
                     int leaveHeight = ((View)mLinearGroup.getParent()).getHeight();
@@ -248,34 +318,6 @@ class LinearManager {
         }
         if (onLinearManagerListener != null) {
             onLinearManagerListener.onResetSize();
-        }
-    }
-
-    protected void notifyDataChange() {
-        if (mLinearGroup != null) {
-            if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
-                if (((View)mLinearGroup.getParent()).getHeight() == 0) {
-                    mLinearGroup.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetVerticalSize();
-                        }
-                    });
-                } else {
-                    resetVerticalSize();
-                }
-            } else {
-                if (((View)mLinearGroup.getParent()).getWidth() == 0) {
-                    mLinearGroup.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetHorizontalSize();
-                        }
-                    });
-                } else {
-                    resetHorizontalSize();
-                }
-            }
         }
     }
 

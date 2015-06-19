@@ -53,6 +53,13 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
         }
     }
 
+    @Override
+    public void notifyDataAll() {
+        if (linearManager != null) {
+            linearManager.notifyDataAll();
+        }
+    }
+
     private void init() {
         linearManager = new LinearManager(this, LinearGroup.VERTICAL);
         linearManager.setOnLinearManagerListener(this);

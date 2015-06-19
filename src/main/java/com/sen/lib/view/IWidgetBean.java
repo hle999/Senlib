@@ -6,5 +6,5 @@ package com.sen.lib.view;
 public interface IWidgetBean {
 
     void notifyDataChange();
-
+    void notifyDataAll();
 }

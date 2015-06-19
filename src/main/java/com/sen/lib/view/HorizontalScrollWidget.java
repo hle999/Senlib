@@ -55,6 +55,13 @@ public class HorizontalScrollWidget extends HorizontalScrollView implements Line
         }
     }
 
+    @Override
+    public void notifyDataAll() {
+        if (linearManager != null) {
+            linearManager.notifyDataAll();
+        }
+    }
+
     private void init() {
         linearManager = new LinearManager(this, LinearGroup.HORIZONTAL);
         linearManager.setOnLinearManagerListener(this);
