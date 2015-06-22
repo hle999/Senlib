@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Sen on 2015/6/10.
  */
-public class HorizontalScrollWidget extends HorizontalScrollView implements LinearManager.OnLinearManagerListener, IWidgetBean{
+public class HorizontalScrollWidget extends HorizontalScrollView implements LinearManager.OnLinearManagerListener/*, IWidgetBean*/{
 
     private LinearManager linearManager;
 
@@ -48,7 +48,7 @@ public class HorizontalScrollWidget extends HorizontalScrollView implements Line
         return null;
     }
 
-    @Override
+    /*@Override
     public void notifyDataChange() {
         if (linearManager != null) {
             linearManager.notifyDataChange();
@@ -60,7 +60,7 @@ public class HorizontalScrollWidget extends HorizontalScrollView implements Line
         if (linearManager != null) {
             linearManager.notifyDataAll();
         }
-    }
+    }*/
 
     private void init() {
         linearManager = new LinearManager(this, LinearGroup.HORIZONTAL);

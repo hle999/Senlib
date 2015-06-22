@@ -9,7 +9,7 @@ import android.widget.ScrollView;
 /**
  * Created by Sen on 2015/6/11.
  */
-public class VerticalScrollWidget extends ScrollView implements LinearManager.OnLinearManagerListener, IWidgetBean {
+public class VerticalScrollWidget extends ScrollView implements LinearManager.OnLinearManagerListener/*, IWidgetBean*/ {
 
     private LinearManager linearManager;
 
@@ -46,7 +46,7 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
         return null;
     }
 
-    @Override
+    /*@Override
     public void notifyDataChange() {
         if (linearManager != null) {
             linearManager.notifyDataChange();
@@ -58,7 +58,7 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
         if (linearManager != null) {
             linearManager.notifyDataAll();
         }
-    }
+    }*/
 
     private void init() {
         linearManager = new LinearManager(this, LinearGroup.VERTICAL);

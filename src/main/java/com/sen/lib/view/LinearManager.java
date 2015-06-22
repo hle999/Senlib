@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Sen on 2015/6/11.
  */
-class LinearManager {
+class LinearManager implements IDataObserver {
 
     private static final int UN_INVALUE = -1;
     private static final int MAX_INCREASE_NUM = 2;
@@ -36,6 +36,14 @@ class LinearManager {
 
     public void setAdapter(BaseItemAdapter adatper) {
         this.adapter = adatper;
+        if (getAdpater() != null) {
+            getAdpater().setDataObserver(this);
+        } else {
+            if (mLinearGroup != null) {
+                mLinearGroup.removeAllViews();
+            }
+            lastAdapter = null;
+        }
         notifyDataChange();
     }
 
@@ -97,59 +105,51 @@ class LinearManager {
         }
     }
 
-    protected void notifyDataChange() {
+    @Override
+    public void notifyDataChange() {
         if (mLinearGroup != null) {
-            if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
-                if (((View)mLinearGroup.getParent()).getHeight() == 0) {
-                    mLinearGroup.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetVerticalSize();
-                        }
-                    });
-                } else {
-                    resetVerticalSize();
-                }
+            if (((View)mLinearGroup.getParent()).getHeight() == 0) {
+                mLinearGroup.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        resetSize();
+                    }
+                });
             } else {
-                if (((View)mLinearGroup.getParent()).getWidth() == 0) {
-                    mLinearGroup.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetHorizontalSize();
-                        }
-                    });
-                } else {
-                    resetHorizontalSize();
-                }
+                resetSize();
             }
         }
     }
 
-    protected void notifyDataAll() {
+    @Override
+    public void notifyDataAll() {
         if (mLinearGroup != null) {
-            if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
-                if (((View)mLinearGroup.getParent()).getHeight() == 0) {
-                    mLinearGroup.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetVerticalAllSize();
-                        }
-                    });
-                } else {
-                    resetVerticalAllSize();
-                }
+            if (((View)mLinearGroup.getParent()).getHeight() == 0) {
+                mLinearGroup.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        resetAllSize();
+                    }
+                });
             } else {
-                if (((View)mLinearGroup.getParent()).getWidth() == 0) {
-                    mLinearGroup.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            resetHorizontalAllSize();
-                        }
-                    });
-                } else {
-                    resetHorizontalAllSize();
-                }
+                resetAllSize();
             }
+        }
+    }
+
+    private void resetSize() {
+        if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
+            resetVerticalSize();
+        } else {
+            resetHorizontalSize();
+        }
+    }
+
+    private void resetAllSize() {
+        if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
+            resetVerticalAllSize();
+        } else {
+            resetHorizontalAllSize();
         }
     }
 
@@ -220,9 +220,12 @@ class LinearManager {
     private void resetHorizontalSize() {
         if (mLinearGroup != null) {
             if (adapter != null) {
-                adapter.setRoot((IWidgetBean)mLinearGroup.getParent());
+//                adapter.setDataObserver((IDataObserver) mLinearGroup.getParent());
                 if (lastAdapter != adapter || mLinearGroup.getCacheLocalArray() != null
                         && mLinearGroup.getCacheLocalArray().size() == 0) {
+                    if (lastAdapter != adapter && lastAdapter != null) {
+                        lastAdapter.setDataObserver(null);
+                    }
                     lastAdapter = adapter;
                     resetHorizontalAllSize();
                 } else {
@@ -230,33 +233,50 @@ class LinearManager {
                     int leaveWidth = ((View)mLinearGroup.getParent()).getWidth();
                     int maxHeight = ((View)mLinearGroup.getParent()).getHeight();
                     if (mLinearGroup != null) {
-                        x = mLinearGroup.getCacheLocalArray().get(mLinearGroup.getCacheLocalArray().size() - 1);
-                        View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
-                        lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
-                        x += lastItemView.getMeasuredWidth();
-                        for (int i = 0; i < adapter.getCount(); i++) {
-                            if (mLinearGroup.getCacheLocalArray().size() > i) {
+                        if (adapter.getCount() > mLinearGroup.getCacheLocalArray().size()) {
+                            x = mLinearGroup.getCacheLocalArray().get(mLinearGroup.getCacheLocalArray().size() - 1);
+                            View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
+                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            x += lastItemView.getMeasuredWidth();
+                            for (int i = 0; i < adapter.getCount(); i++) {
+                                if (mLinearGroup.getCacheLocalArray().size() > i) {
 
-                            } else {
-                                View itemView = adapter.getView(null, mLinearGroup, i);
-                                itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
-                                if (itemView.getMeasuredHeight() > maxHeight) {
-                                    maxHeight = itemView.getMeasuredHeight();
-                                }
-                                if (leaveWidth > x) {
-                                    mLinearGroup.addCacheViewInfo(i, itemView);
-                                    addItem(itemView);
                                 } else {
-                                    if (mLinearGroup.getIncreaseNum() > 0) {
-                                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                                    View itemView = adapter.getView(null, mLinearGroup, i);
+                                    itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                                    if (itemView.getMeasuredHeight() > maxHeight) {
+                                        maxHeight = itemView.getMeasuredHeight();
+                                    }
+                                    if (leaveWidth > x) {
                                         mLinearGroup.addCacheViewInfo(i, itemView);
                                         addItem(itemView);
+                                    } else {
+                                        if (mLinearGroup.getIncreaseNum() > 0) {
+                                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                                            mLinearGroup.addCacheViewInfo(i, itemView);
+                                            addItem(itemView);
+                                        }
                                     }
+                                    mLinearGroup.addCacheToLocal(x);
+                                    x += itemView.getMeasuredWidth();
                                 }
-                                mLinearGroup.addCacheToLocal(x);
-                                x += itemView.getMeasuredWidth();
+                            }
+                        } else {
+                            x = mLinearGroup.getCacheLocalArray().get(adapter.getCount() - 1);
+                            View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
+                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            x += lastItemView.getMeasuredWidth();
+                            int cacheNum = mLinearGroup.getCacheLocalArray().size();
+                            for (int i = 0;i<(cacheNum - adapter.getCount());i++) {
+                                try {
+                                    mLinearGroup.getCacheLocalArray().
+                                            remove(mLinearGroup.getCacheLocalArray().size() - 1);
+                                } catch (IndexOutOfBoundsException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
+
                         mLinearGroup.reset(x, maxHeight);
                         mLinearGroup.requestLayout();
                     }
@@ -272,9 +292,12 @@ class LinearManager {
     private void resetVerticalSize() {
         if (mLinearGroup != null) {
             if (adapter != null) {
-                adapter.setRoot((IWidgetBean)mLinearGroup.getParent());
+//                adapter.setDataObserver((IDataObserver) mLinearGroup.getParent());
                 if (lastAdapter != adapter || mLinearGroup.getCacheLocalArray() != null
                         && mLinearGroup.getCacheLocalArray().size() == 0) {
+                    if (lastAdapter != adapter && lastAdapter != null) {
+                        lastAdapter.setDataObserver(null);
+                    }
                     lastAdapter = adapter;
                     resetVerticalAllSize();
                 } else {
@@ -282,33 +305,50 @@ class LinearManager {
                     int leaveHeight = ((View)mLinearGroup.getParent()).getHeight();
                     int maxWidth = ((View)mLinearGroup.getParent()).getWidth();
                     if (mLinearGroup != null) {
-                        y = mLinearGroup.getCacheLocalArray().get(mLinearGroup.getCacheLocalArray().size() - 1);
-                        View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
-                        lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
-                        y += lastItemView.getMeasuredHeight();
-                        for (int i = 0; i < adapter.getCount(); i++) {
-                            if (mLinearGroup.getCacheLocalArray().size() > i) {
+                        if (adapter.getCount() > mLinearGroup.getCacheLocalArray().size()) {
+                            y = mLinearGroup.getCacheLocalArray().get(mLinearGroup.getCacheLocalArray().size() - 1);
+                            View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
+                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            y += lastItemView.getMeasuredHeight();
+                            for (int i = 0; i < adapter.getCount(); i++) {
+                                if (mLinearGroup.getCacheLocalArray().size() > i) {
 
-                            } else {
-                                View itemView = adapter.getView(null, mLinearGroup, i);
-                                itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
-                                if (itemView.getMeasuredWidth() > maxWidth) {
-                                    maxWidth = itemView.getMeasuredWidth();
-                                }
-                                if (leaveHeight > y) {
-                                    mLinearGroup.addCacheViewInfo(i, itemView);
-                                    addItem(itemView);
                                 } else {
-                                    if (mLinearGroup.getIncreaseNum() > 0) {
-                                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                                    View itemView = adapter.getView(null, mLinearGroup, i);
+                                    itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                                    if (itemView.getMeasuredWidth() > maxWidth) {
+                                        maxWidth = itemView.getMeasuredWidth();
+                                    }
+                                    if (leaveHeight > y) {
                                         mLinearGroup.addCacheViewInfo(i, itemView);
                                         addItem(itemView);
+                                    } else {
+                                        if (mLinearGroup.getIncreaseNum() > 0) {
+                                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                                            mLinearGroup.addCacheViewInfo(i, itemView);
+                                            addItem(itemView);
+                                        }
                                     }
+                                    mLinearGroup.addCacheToLocal(y);
+                                    y += itemView.getMeasuredHeight();
                                 }
-                                mLinearGroup.addCacheToLocal(y);
-                                y += itemView.getMeasuredHeight();
+                            }
+                        } else {
+                            y = mLinearGroup.getCacheLocalArray().get(adapter.getCount() - 1);
+                            View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
+                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            y += lastItemView.getMeasuredHeight();
+                            int cacheNum = mLinearGroup.getCacheLocalArray().size();
+                            for (int i = 0;i<(cacheNum - adapter.getCount());i++) {
+                                try {
+                                    mLinearGroup.getCacheLocalArray().
+                                            remove(mLinearGroup.getCacheLocalArray().size() - 1);
+                                } catch (IndexOutOfBoundsException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
+
                         mLinearGroup.reset(maxWidth, y);
                         mLinearGroup.requestLayout();
                     }
@@ -336,14 +376,16 @@ class LinearManager {
                     index = cacheLocalArray.indexOf(l);
                 }
             }
+
             if (index != UN_INVALUE) {
                 if (mLinearGroup != null && cacheLocalArray != null) {
                     LinearGroup.CacheViewInfo lastCacheViewInfo = mLinearGroup.
                             getCacheViewInfoArray().get(mLinearGroup.getCacheViewInfoArray().size() - 1);
                     if (lastCacheViewInfo != null) {
-                        for (int i = 1;(index - lastCacheViewInfo.index) >= i;i++) {
-                            if (cacheLocalArray.size() > lastCacheViewInfo.index + i) {
-                                addItemToEnd(lastCacheViewInfo.index + i);
+                        int lastCacheViewIndex = lastCacheViewInfo.index;
+                        for (int i = 1;(index - lastCacheViewIndex) >= i;i++) {
+                            if (cacheLocalArray.size() > lastCacheViewIndex + i) {
+                                addItemToEnd(lastCacheViewIndex + i);
                             }
                         }
                     }
@@ -373,9 +415,10 @@ class LinearManager {
                         && cacheLocalArray.size() > index && index >= 0) {
                     LinearGroup.CacheViewInfo firstCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(0);
                     if (firstCacheViewInfo != null) {
-                        for (int i = 1; (firstCacheViewInfo.index - index) >= i;i++) {
-                            if (cacheLocalArray.size() > firstCacheViewInfo.index - i && firstCacheViewInfo.index - i > UN_INVALUE) {
-                                addItemToHead(firstCacheViewInfo.index - i);
+                        int firstCacheViewIndex = firstCacheViewInfo.index;
+                        for (int i = 1; (firstCacheViewIndex - index) >= i;i++) {
+                            if (cacheLocalArray.size() > firstCacheViewIndex - i && firstCacheViewIndex - i > UN_INVALUE) {
+                                addItemToHead(firstCacheViewIndex - i);
                             }
                         }
                     }
