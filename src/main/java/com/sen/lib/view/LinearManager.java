@@ -17,6 +17,9 @@ class LinearManager implements IDataObserver {
     private BaseItemAdapter lastAdapter;
     private BaseItemAdapter adapter;
 
+    private int originWidth;
+    private int originHeight;
+
     private OnLinearManagerListener onLinearManagerListener;
 
     public void setOnLinearManagerListener(OnLinearManagerListener onLinearManagerListener) {
@@ -41,6 +44,7 @@ class LinearManager implements IDataObserver {
         } else {
             if (mLinearGroup != null) {
                 mLinearGroup.removeAllViews();
+                mLinearGroup.reset(originWidth, originHeight);
             }
             lastAdapter = null;
         }
@@ -64,6 +68,13 @@ class LinearManager implements IDataObserver {
             }
         }
         return null;
+    }
+
+    public void setOriginSize(int width, int height) {
+        if (mLinearGroup != null) {
+            originWidth = width;
+            originHeight = height;
+        }
     }
 
     public void removeItem(View item) {
@@ -230,20 +241,20 @@ class LinearManager implements IDataObserver {
                     resetHorizontalAllSize();
                 } else {
                     int x = 0;
-                    int leaveWidth = ((View)mLinearGroup.getParent()).getWidth();
-                    int maxHeight = ((View)mLinearGroup.getParent()).getHeight();
+                    int leaveWidth = originWidth;
+                    int maxHeight = originWidth;
                     if (mLinearGroup != null) {
                         if (adapter.getCount() > mLinearGroup.getCacheLocalArray().size()) {
                             x = mLinearGroup.getCacheLocalArray().get(mLinearGroup.getCacheLocalArray().size() - 1);
                             View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
-                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            lastItemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
                             x += lastItemView.getMeasuredWidth();
-                            for (int i = 0; i < adapter.getCount(); i++) {
+                            for (int i = mLinearGroup.getCacheLocalArray().size(); i < adapter.getCount(); i++) {
                                 if (mLinearGroup.getCacheLocalArray().size() > i) {
 
                                 } else {
                                     View itemView = adapter.getView(null, mLinearGroup, i);
-                                    itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                                    itemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
                                     if (itemView.getMeasuredHeight() > maxHeight) {
                                         maxHeight = itemView.getMeasuredHeight();
                                     }
@@ -264,7 +275,7 @@ class LinearManager implements IDataObserver {
                         } else {
                             x = mLinearGroup.getCacheLocalArray().get(adapter.getCount() - 1);
                             View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
-                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            lastItemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
                             x += lastItemView.getMeasuredWidth();
                             int cacheNum = mLinearGroup.getCacheLocalArray().size();
                             for (int i = 0;i<(cacheNum - adapter.getCount());i++) {
@@ -302,20 +313,21 @@ class LinearManager implements IDataObserver {
                     resetVerticalAllSize();
                 } else {
                     int y = 0;
-                    int leaveHeight = ((View)mLinearGroup.getParent()).getHeight();
-                    int maxWidth = ((View)mLinearGroup.getParent()).getWidth();
+                    int leaveHeight = originHeight;
+                    int maxWidth = originWidth;
                     if (mLinearGroup != null) {
                         if (adapter.getCount() > mLinearGroup.getCacheLocalArray().size()) {
                             y = mLinearGroup.getCacheLocalArray().get(mLinearGroup.getCacheLocalArray().size() - 1);
                             View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
-                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            lastItemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
                             y += lastItemView.getMeasuredHeight();
-                            for (int i = 0; i < adapter.getCount(); i++) {
+                            for (int i = mLinearGroup.getCacheLocalArray().size(); i < adapter.getCount(); i++) {
                                 if (mLinearGroup.getCacheLocalArray().size() > i) {
 
                                 } else {
                                     View itemView = adapter.getView(null, mLinearGroup, i);
-                                    itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                                    itemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
+
                                     if (itemView.getMeasuredWidth() > maxWidth) {
                                         maxWidth = itemView.getMeasuredWidth();
                                     }
@@ -336,7 +348,7 @@ class LinearManager implements IDataObserver {
                         } else {
                             y = mLinearGroup.getCacheLocalArray().get(adapter.getCount() - 1);
                             View lastItemView = adapter.getView(null, mLinearGroup, mLinearGroup.getCacheLocalArray().size() - 1);
-                            lastItemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                            lastItemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
                             y += lastItemView.getMeasuredHeight();
                             int cacheNum = mLinearGroup.getCacheLocalArray().size();
                             for (int i = 0;i<(cacheNum - adapter.getCount());i++) {
@@ -351,6 +363,7 @@ class LinearManager implements IDataObserver {
 
                         mLinearGroup.reset(maxWidth, y);
                         mLinearGroup.requestLayout();
+
                     }
 
                 }

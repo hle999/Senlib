@@ -74,6 +74,14 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
     }
 
     @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if (linearManager != null && changed) {
+            linearManager.setOriginSize(r - l - getPaddingLeft() - getPaddingRight(), b - t);
+        }
+    }
+
+    @Override
     public void removeAllViews() {
         super.removeAllViews();
         if (linearManager != null) {
