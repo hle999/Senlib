@@ -444,7 +444,7 @@ class LinearManager implements IDataObserver {
         LinearGroup.CacheViewInfo firstCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(0);
         mLinearGroup.getCacheViewInfoArray().remove(0);
         if (firstCacheViewInfo != null) {
-            firstCacheViewInfo.needMeasured = true;
+//            firstCacheViewInfo.needMeasured = true;
             firstCacheViewInfo.index = addIndex;
             firstCacheViewInfo.view = adapter.getView(firstCacheViewInfo.view, mLinearGroup, addIndex);
             mLinearGroup.getCacheViewInfoArray().add(firstCacheViewInfo);
@@ -456,7 +456,7 @@ class LinearManager implements IDataObserver {
         LinearGroup.CacheViewInfo lastCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(mLinearGroup.getCacheViewInfoArray().size() - 1);
         mLinearGroup.getCacheViewInfoArray().remove(mLinearGroup.getCacheViewInfoArray().size() - 1);
         if (lastCacheViewInfo != null) {
-            lastCacheViewInfo.needMeasured = true;
+//            lastCacheViewInfo.needMeasured = true;
             lastCacheViewInfo.index = addIndex;
             lastCacheViewInfo.view = adapter.getView(lastCacheViewInfo.view, mLinearGroup, addIndex);
             mLinearGroup.getCacheViewInfoArray().add(0, lastCacheViewInfo);

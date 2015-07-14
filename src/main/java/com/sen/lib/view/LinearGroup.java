@@ -74,7 +74,7 @@ public class LinearGroup extends ViewGroup {
 
     public void addCacheViewInfo(int index, View view) {
         CacheViewInfo cacheViewInfo = new CacheViewInfo(index, view);
-        cacheViewInfo.needMeasured = false;
+//        cacheViewInfo.needMeasured = false;
         mCacheViewInfoArray.add(cacheViewInfo);
     }
 
@@ -143,10 +143,7 @@ public class LinearGroup extends ViewGroup {
 
     private void horizontalLinearLayout(CacheViewInfo cacheViewInfo, int x) {
         if (cacheViewInfo != null) {
-            if (cacheViewInfo.needMeasured) {
-                cacheViewInfo.needMeasured = false;
-                cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
-            }
+            cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
             x = getPaddingLeft() + x;
             cacheViewInfo.view.layout(x, getPaddingTop(),
                     x + cacheViewInfo.view.getMeasuredWidth(),
@@ -156,10 +153,7 @@ public class LinearGroup extends ViewGroup {
 
     private void verticalLinearLayout(CacheViewInfo cacheViewInfo, int y) {
         if (cacheViewInfo != null) {
-            if (cacheViewInfo.needMeasured) {
-                cacheViewInfo.needMeasured = false;
-                cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
-            }
+            cacheViewInfo.view.measure(getMeasuredWidth(), getMeasuredHeight());
             y = getPaddingTop() + y;
             cacheViewInfo.view.layout(getPaddingLeft(), y,
                     getPaddingLeft() + cacheViewInfo.view.getMeasuredWidth(),
@@ -201,7 +195,7 @@ public class LinearGroup extends ViewGroup {
     public class CacheViewInfo {
         public int index;
         public View view;
-        protected boolean needMeasured = false;
+//        protected boolean needMeasured = false;
 
         public CacheViewInfo(int index, View view) {
             this.index = index;
