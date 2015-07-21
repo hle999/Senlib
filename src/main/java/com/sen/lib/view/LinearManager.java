@@ -193,6 +193,7 @@ class LinearManager implements IDataObserver {
             }
             mLinearGroup.reset(x, maxHeight);
             mLinearGroup.requestLayout();
+            System.out.println("Linear's horizontal...1: " + x);
         }
     }
 
@@ -240,7 +241,8 @@ class LinearManager implements IDataObserver {
                     lastAdapter = adapter;
                     resetHorizontalAllSize();
                 } else {
-                    int x = 0;
+                    changeHorizontalSize();
+                    /*int x = 0;
                     int leaveWidth = originWidth;
                     int maxHeight = originWidth;
                     if (mLinearGroup != null) {
@@ -290,13 +292,81 @@ class LinearManager implements IDataObserver {
 
                         mLinearGroup.reset(x, maxHeight);
                         mLinearGroup.requestLayout();
-                    }
+                    }*/
 
                 }
             }
         }
         if (onLinearManagerListener != null) {
             onLinearManagerListener.onResetSize();
+        }
+    }
+
+    private void changeHorizontalSize() {
+        if (mLinearGroup != null && adapter != null) {
+            int x = 0;
+            int maxHeight = originHeight;
+            int leaveWidth = originWidth;
+            if (mLinearGroup.getCacheLocalArray() != null) {
+                mLinearGroup.getCacheLocalArray().clear();
+            }
+            int cacheViewNum = mLinearGroup.getCacheViewInfoArray().size();
+            if (cacheViewNum > adapter.getCount()) {
+                for (int i = 0;i<(cacheViewNum - adapter.getCount());i++) {
+                    try {
+                        LinearGroup.CacheViewInfo cacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(
+                                mLinearGroup.getCacheViewInfoArray().size() - 1);
+                        if (cacheViewInfo != null) {
+                            if (cacheViewInfo.view != null) {
+
+                                mLinearGroup.removeView(cacheViewInfo.view);
+                            }
+                            mLinearGroup.getCacheViewInfoArray().remove(cacheViewInfo);
+                        }
+                        if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            LinearGroup.CacheViewInfo lastCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(
+                    mLinearGroup.getCacheViewInfoArray().size() - 1);
+            int lastItemViewIndex = -1;
+            if (lastCacheViewInfo != null) {
+                lastItemViewIndex = lastCacheViewInfo.index;
+            }
+            for (int i = 0; i < adapter.getCount(); i++) {
+                View itemView = adapter.getView(null, mLinearGroup, i);
+                itemView.measure(mLinearGroup.getMeasuredWidth(), mLinearGroup.getMeasuredHeight());
+                if (itemView.getMeasuredHeight() > maxHeight) {
+                    maxHeight = itemView.getMeasuredHeight();
+                }
+                if (leaveWidth > 0) {
+                    if (i > lastItemViewIndex) {
+                        mLinearGroup.addCacheViewInfo(i, itemView);
+                        addItem(itemView);
+                        if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                        }
+                    }
+                } else {
+                    if (mLinearGroup.getIncreaseNum() > 0) {
+                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                        mLinearGroup.addCacheViewInfo(i, itemView);
+                        addItem(itemView);
+                    }
+                }
+                mLinearGroup.addCacheToLocal(x);
+                if (leaveWidth > 0) {
+                    leaveWidth -= itemView.getMeasuredWidth();
+                }
+                x += itemView.getMeasuredWidth();
+            }
+            mLinearGroup.reset(x, maxHeight);
+            mLinearGroup.requestLayout();
+            System.out.println("Linear's horizontal...2: " + x);
         }
     }
 
@@ -312,7 +382,8 @@ class LinearManager implements IDataObserver {
                     lastAdapter = adapter;
                     resetVerticalAllSize();
                 } else {
-                    int y = 0;
+                    changeVerticalSize();
+                    /*int y = 0;
                     int leaveHeight = originHeight;
                     int maxWidth = originWidth;
                     if (mLinearGroup != null) {
@@ -364,13 +435,82 @@ class LinearManager implements IDataObserver {
                         mLinearGroup.reset(maxWidth, y);
                         mLinearGroup.requestLayout();
 
-                    }
+                    }*/
 
                 }
             }
         }
         if (onLinearManagerListener != null) {
             onLinearManagerListener.onResetSize();
+        }
+    }
+
+    private void changeVerticalSize() {
+        if (mLinearGroup != null && adapter != null) {
+            int y = 0;
+            int leaveHeight = originHeight;
+            int maxWidth = originWidth;
+            if (mLinearGroup.getCacheLocalArray() != null) {
+                mLinearGroup.getCacheLocalArray().clear();
+            }
+            int cacheViewNum = mLinearGroup.getCacheViewInfoArray().size();
+            if (cacheViewNum > adapter.getCount()) {
+                for (int i = 0;i<(cacheViewNum - adapter.getCount());i++) {
+                    try {
+                        LinearGroup.CacheViewInfo cacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(
+                                mLinearGroup.getCacheViewInfoArray().size() - 1);
+                        if (cacheViewInfo != null) {
+                            if (cacheViewInfo.view != null) {
+
+                                mLinearGroup.removeView(cacheViewInfo.view);
+                            }
+                            mLinearGroup.getCacheViewInfoArray().remove(cacheViewInfo);
+                        }
+                        if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                        }
+                    } catch (IndexOutOfBoundsException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            LinearGroup.CacheViewInfo lastCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(
+                    mLinearGroup.getCacheViewInfoArray().size() - 1);
+            int lastItemViewIndex = -1;
+            if (lastCacheViewInfo != null) {
+                lastItemViewIndex = lastCacheViewInfo.index;
+            }
+            for (int i = 0; i < adapter.getCount(); i++) {
+                View itemView = adapter.getView(null, mLinearGroup, i);
+                itemView.measure(mLinearGroup.getWidth(), mLinearGroup.getHeight());
+                if (itemView.getMeasuredWidth() > maxWidth) {
+                    maxWidth = itemView.getMeasuredWidth();
+                }
+
+                if (leaveHeight > 0) {
+                    if (i > lastItemViewIndex) {
+                        mLinearGroup.addCacheViewInfo(i, itemView);
+                        addItem(itemView);
+                        if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                        }
+                    }
+                } else {
+                    if (mLinearGroup.getIncreaseNum() > 0) {
+                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                        mLinearGroup.addCacheViewInfo(i, itemView);
+                        addItem(itemView);
+                    }
+                }
+
+                mLinearGroup.addCacheToLocal(y);
+                if (leaveHeight > 0) {
+                    leaveHeight -= itemView.getMeasuredHeight();
+                }
+                y += itemView.getMeasuredHeight();
+            }
+            mLinearGroup.reset(maxWidth, y);
+            mLinearGroup.requestLayout();
         }
     }
 
@@ -424,11 +564,13 @@ class LinearManager implements IDataObserver {
                 index = 0;
             }
             if (index != UN_INVALUE) {
-                if (mLinearGroup != null && cacheLocalArray != null
-                        && cacheLocalArray.size() > index && index >= 0) {
+                if (mLinearGroup != null && cacheLocalArray.size() > index && index >= 0) {
                     LinearGroup.CacheViewInfo firstCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(0);
                     if (firstCacheViewInfo != null) {
                         int firstCacheViewIndex = firstCacheViewInfo.index;
+                        if (index == firstCacheViewIndex && index > 0) {
+                            index--;
+                        }
                         for (int i = 1; (firstCacheViewIndex - index) >= i;i++) {
                             if (cacheLocalArray.size() > firstCacheViewIndex - i && firstCacheViewIndex - i > UN_INVALUE) {
                                 addItemToHead(firstCacheViewIndex - i);

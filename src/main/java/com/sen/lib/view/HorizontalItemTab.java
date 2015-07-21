@@ -117,15 +117,19 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
     @Override
     public void onResetSize() {
         if (getItemGroup() instanceof LinearGroup) {
-            final int currentIndexX = ((LinearGroup)getItemGroup()).getCacheLocalArray().get(selectItemIndex);
-            if (currentIndexX != getScrollX()) {
-                getItemGroup().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        HorizontalItemTab.this.smoothScrollBy(currentIndexX - getScrollX(), 0);
-                    }
-                });
+            if (selectItemIndex >=  ((LinearGroup)getItemGroup()).getCacheLocalArray().size()) {
+                selectItemIndex = ((LinearGroup)getItemGroup()).getCacheLocalArray().size() - 1;
+            } else {
+                final int currentIndexX = ((LinearGroup)getItemGroup()).getCacheLocalArray().get(selectItemIndex);
+                if (currentIndexX != getScrollX()) {
+                    getItemGroup().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            HorizontalItemTab.this.smoothScrollBy(currentIndexX - getScrollX(), 0);
+                        }
+                    });
 
+                }
             }
         }
     }

@@ -33,6 +33,12 @@ public class CustomViewPager extends ViewPager {
         listenerList.add(listener);
     }
 
+    public void removePagerChangeListener(ViewPager.OnPageChangeListener listener) {
+        if (listenerList != null && listener != null) {
+            listenerList.remove(listener);
+        }
+    }
+
     public CustomViewPager(Context context) {
         super(context);
         setOnPageChangeListener();
