@@ -1,4 +1,4 @@
-package com.sen.lib.utils;
+package com.sen.lib.graphics;
 
 import android.graphics.Color;
 
