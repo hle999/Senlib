@@ -9,8 +9,8 @@ import java.util.List;
 public class TransitionalColor {
 
     /**
-     * 输入一个颜色,将它拆成三个部分:
-     * 红色,绿色和蓝色
+     * @param color
+     * @return  red,green,blue
      */
     private static int[] retrieveRGBComponent(int color)
     {
@@ -22,7 +22,8 @@ public class TransitionalColor {
     }
 
     /**
-     * 红色,绿色和蓝色三色组合
+     * @param rgb:red, green, blue
+     * @return color
      */
     private static int generateFromRGBComponent(int[] rgb)
     {
@@ -33,8 +34,7 @@ public class TransitionalColor {
     }
 
     /**
-     * startColor是浅色，endColor是深色，实现渐变
-     * steps是指在多大的区域中渐变,
+     * linear gradient
      */
     public static List<Integer> generateTransitionalColor(int startColor, int endColor, int steps)
     {
