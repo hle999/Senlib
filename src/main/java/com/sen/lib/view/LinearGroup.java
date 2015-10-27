@@ -23,6 +23,7 @@ public class LinearGroup extends ViewGroup {
 
     private List<Integer> mCacheXArray;
     private List<CacheViewInfo> mCacheViewInfoArray;
+    private List<Integer> mCacheViewIndexArray;
 
     int getIncreaseNum() {
         return increaseNum;
@@ -65,6 +66,7 @@ public class LinearGroup extends ViewGroup {
     private void init() {
         mCacheXArray = new ArrayList<Integer>();
         mCacheViewInfoArray = new ArrayList<CacheViewInfo>();
+        mCacheViewIndexArray = new ArrayList<Integer>();
     }
 
     public void reset(int width, int height) {
@@ -72,10 +74,42 @@ public class LinearGroup extends ViewGroup {
         this.mCacheHeight = height + getPaddingTop() + getPaddingBottom();
     }
 
-    public void addCacheViewInfo(int index, View view) {
-        CacheViewInfo cacheViewInfo = new CacheViewInfo(index, view);
+    public boolean addCacheViewInfo(int index, View view) {
 //        cacheViewInfo.needMeasured = false;
-        mCacheViewInfoArray.add(cacheViewInfo);
+//        mCacheViewInfoArray.add(cacheViewInfo);
+        if (mCacheViewInfoArray != null && !isCacheViewIndexExists(index)) {
+            CacheViewInfo cacheViewInfo = new CacheViewInfo(index, view);
+            return addCacheViewInfo(mCacheViewInfoArray.size(), cacheViewInfo);
+        }
+        return false;
+    }
+
+    public boolean addCacheViewInfo(int index, CacheViewInfo cacheViewInfo) {
+        if (mCacheViewInfoArray != null && cacheViewInfo != null) {
+            mCacheViewInfoArray.add(index, cacheViewInfo);
+            mCacheViewIndexArray.add(cacheViewInfo.index);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeCacheViewInfo(int index) {
+        if (mCacheViewInfoArray != null) {
+            CacheViewInfo removeCacheViewInfo = mCacheViewInfoArray.get(index);
+            if (removeCacheViewInfo != null) {
+                mCacheViewIndexArray.remove((Integer)removeCacheViewInfo.index);
+                mCacheViewInfoArray.remove(index);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isCacheViewIndexExists(int index) {
+        if (mCacheViewIndexArray != null && mCacheViewIndexArray.indexOf(index) > -1) {
+            return true;
+        }
+        return false;
     }
 
     public void addCacheToLocal(int local) {

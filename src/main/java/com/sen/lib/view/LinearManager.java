@@ -178,13 +178,17 @@ class LinearManager implements IDataObserver {
                     maxHeight = itemView.getMeasuredHeight();
                 }
                 if (leaveWidth > 0) {
-                    mLinearGroup.addCacheViewInfo(i, itemView);
-                    addItem(itemView);
-                } else {
-                    if (mLinearGroup.getIncreaseNum() > 0) {
-                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                    if (!mLinearGroup.isCacheViewIndexExists(i)) {
                         mLinearGroup.addCacheViewInfo(i, itemView);
                         addItem(itemView);
+                    }
+                } else {
+                    if (mLinearGroup.getIncreaseNum() > 0) {
+                        if (!mLinearGroup.isCacheViewIndexExists(i)) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                        }
                     }
                 }
                 mLinearGroup.addCacheToLocal(x);
@@ -211,13 +215,17 @@ class LinearManager implements IDataObserver {
                     maxWidth = itemView.getMeasuredWidth();
                 }
                 if (leaveHeight > 0) {
-                    mLinearGroup.addCacheViewInfo(i, itemView);
-                    addItem(itemView);
-                } else {
-                    if (mLinearGroup.getIncreaseNum() > 0) {
-                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                    if (!mLinearGroup.isCacheViewIndexExists(i)) {
                         mLinearGroup.addCacheViewInfo(i, itemView);
                         addItem(itemView);
+                    }
+                } else {
+                    if (mLinearGroup.getIncreaseNum() > 0) {
+                        if (!mLinearGroup.isCacheViewIndexExists(i)) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                        }
                     }
                 }
                 mLinearGroup.addCacheToLocal(y);
@@ -345,17 +353,21 @@ class LinearManager implements IDataObserver {
                 }
                 if (leaveWidth > 0) {
                     if (i > lastItemViewIndex) {
-                        mLinearGroup.addCacheViewInfo(i, itemView);
-                        addItem(itemView);
-                        if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
-                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                        if (!mLinearGroup.isCacheViewIndexExists(i)) {
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                            if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
+                                mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                            }
                         }
                     }
                 } else {
                     if (mLinearGroup.getIncreaseNum() > 0) {
-                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
-                        mLinearGroup.addCacheViewInfo(i, itemView);
-                        addItem(itemView);
+                        if (!mLinearGroup.isCacheViewIndexExists(i)) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                        }
                     }
                 }
                 mLinearGroup.addCacheToLocal(x);
@@ -489,17 +501,21 @@ class LinearManager implements IDataObserver {
 
                 if (leaveHeight > 0) {
                     if (i > lastItemViewIndex) {
-                        mLinearGroup.addCacheViewInfo(i, itemView);
-                        addItem(itemView);
-                        if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
-                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                        if (!mLinearGroup.isCacheViewIndexExists(i)) {
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                            if (MAX_INCREASE_NUM > mLinearGroup.getIncreaseNum()) {
+                                mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() + 1);
+                            }
                         }
                     }
                 } else {
                     if (mLinearGroup.getIncreaseNum() > 0) {
-                        mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
-                        mLinearGroup.addCacheViewInfo(i, itemView);
-                        addItem(itemView);
+                        if (!mLinearGroup.isCacheViewIndexExists(i)) {
+                            mLinearGroup.setIncreaseNum(mLinearGroup.getIncreaseNum() - 1);
+                            mLinearGroup.addCacheViewInfo(i, itemView);
+                            addItem(itemView);
+                        }
                     }
                 }
 
@@ -517,16 +533,19 @@ class LinearManager implements IDataObserver {
     private void computeToEnd(int local) {
         if (mLinearGroup != null && mLinearGroup.getCacheLocalArray() != null) {
             List<Integer> cacheLocalArray = mLinearGroup.getCacheLocalArray();
-            int newLocal = 0;
+            /*int height = 0;
             if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
-                newLocal = local + ((View)mLinearGroup.getParent()).getHeight();
+                height = ((View)mLinearGroup.getParent()).getHeight();
             } else {
-                newLocal = local + ((View)mLinearGroup.getParent()).getWidth();
+                height = ((View)mLinearGroup.getParent()).getWidth();
             }
+            local += height;*/
             int index = UN_INVALUE;
             for (Integer l : cacheLocalArray) {
-                if (newLocal >= l) {
+                if (local >= l) {
                     index = cacheLocalArray.indexOf(l);
+                } else {
+                    break;
                 }
             }
 
@@ -536,6 +555,9 @@ class LinearManager implements IDataObserver {
                             getCacheViewInfoArray().get(mLinearGroup.getCacheViewInfoArray().size() - 1);
                     if (lastCacheViewInfo != null) {
                         int lastCacheViewIndex = lastCacheViewInfo.index;
+                        if (index == lastCacheViewIndex && (cacheLocalArray.size() - 1) > index) {
+                            index++;
+                        }
                         for (int i = 1;(index - lastCacheViewIndex) >= i;i++) {
                             if (cacheLocalArray.size() > lastCacheViewIndex + i) {
                                 addItemToEnd(lastCacheViewIndex + i);
@@ -558,6 +580,8 @@ class LinearManager implements IDataObserver {
                 for (Integer l : cacheLocalArray) {
                     if (local >= l) {
                         index = cacheLocalArray.indexOf(l);
+                    } else {
+                        break;
                     }
                 }
             } else {
@@ -583,26 +607,34 @@ class LinearManager implements IDataObserver {
     }
 
     private void addItemToEnd(int addIndex) {
-        LinearGroup.CacheViewInfo firstCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(0);
-        mLinearGroup.getCacheViewInfoArray().remove(0);
-        if (firstCacheViewInfo != null) {
+        if (mLinearGroup != null && !mLinearGroup.isCacheViewIndexExists(addIndex)) {
+            LinearGroup.CacheViewInfo firstCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(0);
+//        mLinearGroup.getCacheViewInfoArray().remove(0);
+            if (firstCacheViewInfo != null) {
+                mLinearGroup.removeCacheViewInfo(0);
 //            firstCacheViewInfo.needMeasured = true;
-            firstCacheViewInfo.index = addIndex;
-            firstCacheViewInfo.view = adapter.getView(firstCacheViewInfo.view, mLinearGroup, addIndex);
-            mLinearGroup.getCacheViewInfoArray().add(firstCacheViewInfo);
-            mLinearGroup.linearLayout(firstCacheViewInfo, mLinearGroup.getCacheLocalArray().get(addIndex));
+                firstCacheViewInfo.index = addIndex;
+                firstCacheViewInfo.view = adapter.getView(firstCacheViewInfo.view, mLinearGroup, addIndex);
+//            mLinearGroup.getCacheViewInfoArray().add(firstCacheViewInfo);
+                mLinearGroup.addCacheViewInfo(mLinearGroup.getCacheViewInfoArray().size(), firstCacheViewInfo);
+                mLinearGroup.linearLayout(firstCacheViewInfo, mLinearGroup.getCacheLocalArray().get(addIndex));
+            }
         }
     }
 
     private void addItemToHead(int addIndex) {
-        LinearGroup.CacheViewInfo lastCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(mLinearGroup.getCacheViewInfoArray().size() - 1);
-        mLinearGroup.getCacheViewInfoArray().remove(mLinearGroup.getCacheViewInfoArray().size() - 1);
-        if (lastCacheViewInfo != null) {
+        if (mLinearGroup != null && !mLinearGroup.isCacheViewIndexExists(addIndex)) {
+            LinearGroup.CacheViewInfo lastCacheViewInfo = mLinearGroup.getCacheViewInfoArray().get(mLinearGroup.getCacheViewInfoArray().size() - 1);
+//        mLinearGroup.getCacheViewInfoArray().remove(mLinearGroup.getCacheViewInfoArray().size() - 1);
+            if (lastCacheViewInfo != null) {
+                mLinearGroup.removeCacheViewInfo(mLinearGroup.getCacheViewInfoArray().size() - 1);
 //            lastCacheViewInfo.needMeasured = true;
-            lastCacheViewInfo.index = addIndex;
-            lastCacheViewInfo.view = adapter.getView(lastCacheViewInfo.view, mLinearGroup, addIndex);
-            mLinearGroup.getCacheViewInfoArray().add(0, lastCacheViewInfo);
-            mLinearGroup.linearLayout(lastCacheViewInfo, mLinearGroup.getCacheLocalArray().get(addIndex));
+                lastCacheViewInfo.index = addIndex;
+                lastCacheViewInfo.view = adapter.getView(lastCacheViewInfo.view, mLinearGroup, addIndex);
+//            mLinearGroup.getCacheViewInfoArray().add(0, lastCacheViewInfo);
+                mLinearGroup.addCacheViewInfo(0, lastCacheViewInfo);
+                mLinearGroup.linearLayout(lastCacheViewInfo, mLinearGroup.getCacheLocalArray().get(addIndex));
+            }
         }
     }
 
