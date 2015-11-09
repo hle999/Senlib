@@ -39,8 +39,8 @@ class LinearManager implements IDataObserver {
 
     public void setAdapter(BaseItemAdapter adatper) {
         this.adapter = adatper;
-        if (getAdpater() != null) {
-            getAdpater().setDataObserver(this);
+        if (this.adapter != null) {
+            this.adapter.setDataObserver(this);
         } else {
             if (mLinearGroup != null) {
                 mLinearGroup.removeAllViews();
@@ -197,7 +197,6 @@ class LinearManager implements IDataObserver {
             }
             mLinearGroup.reset(x, maxHeight);
             mLinearGroup.requestLayout();
-            System.out.println("Linear's horizontal...1: " + x);
         }
     }
 
@@ -378,7 +377,6 @@ class LinearManager implements IDataObserver {
             }
             mLinearGroup.reset(x, maxHeight);
             mLinearGroup.requestLayout();
-            System.out.println("Linear's horizontal...2: " + x);
         }
     }
 
@@ -541,13 +539,24 @@ class LinearManager implements IDataObserver {
             }
             local += height;*/
             int index = UN_INVALUE;
-            for (Integer l : cacheLocalArray) {
-                if (local >= l) {
-                    index = cacheLocalArray.indexOf(l);
-                } else {
-                    break;
+            if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
+                for (Integer l : cacheLocalArray) {
+                    if ((local + originHeight) >= l) {
+                        index = cacheLocalArray.indexOf(l);
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                for (Integer l : cacheLocalArray) {
+                    if ((local + originWidth) >= l) {
+                        index = cacheLocalArray.indexOf(l);
+                    } else {
+                        break;
+                    }
                 }
             }
+
 
             if (index != UN_INVALUE) {
                 if (mLinearGroup != null && cacheLocalArray != null) {

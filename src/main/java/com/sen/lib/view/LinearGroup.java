@@ -202,6 +202,12 @@ public class LinearGroup extends ViewGroup {
         if (mCacheXArray != null) {
             mCacheXArray.clear();
         }
+        if (mCacheViewIndexArray != null) {
+            mCacheViewIndexArray.clear();
+        }
+        mCacheWidth = 0;
+        mCacheHeight = 0;
+        increaseNum = 0;
     }
 
     public static int resolveSizeAndState(int size, int measureSpec, int childMeasuredState) {

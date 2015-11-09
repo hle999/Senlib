@@ -96,8 +96,11 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
     public void scrollTab(float positionPercent, int tabIndex) {
         this.positionPercent = positionPercent;
         this.tabIndex = tabIndex;
+        tabIndex--;
         LinearGroup mLinearGroup = (LinearGroup)getItemGroup();
-        if (mLinearGroup != null && mLinearGroup.getCacheLocalArray() != null && mLinearGroup.getCacheLocalArray().size() > tabIndex) {
+        if (mLinearGroup != null && mLinearGroup.getCacheLocalArray() != null
+                && mLinearGroup.getCacheLocalArray().size() > tabIndex
+                && tabIndex >= 0) {
             int currentLeft = mLinearGroup.getCacheLocalArray().get(tabIndex);
             int currentWidth = 0;
             if (mLinearGroup.getCacheViewInfoArray() != null) {
@@ -144,7 +147,7 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        ViewGroup viewGroup = (ViewGroup) getChildAt(0);
+        /*ViewGroup viewGroup = (ViewGroup) getChildAt(0);
         if (viewGroup != null && viewGroup.getChildCount() > tabIndex) {
             View currentItem = viewGroup.getChildAt(tabIndex);
             float currentLeft = currentItem.getLeft();
@@ -170,6 +173,39 @@ public class HorizontalItemTab extends HorizontalScrollWidget implements View.On
                 currentRight = currentRight + (nextRight - currentRight) * positionPercent;
             }
             canvas.drawRect(currentLeft, getHeight() - tabHeight, currentRight, getHeight(), mTabPaint);
+
+        }*/
+
+        LinearGroup mLinearGroup = (LinearGroup)getItemGroup();
+        if (mLinearGroup != null && mLinearGroup.getCacheLocalArray().size() > tabIndex && tabIndex >= 0) {
+            View currentItem = getItemView(tabIndex);
+            if (currentItem != null) {
+                float currentLeft = currentItem.getLeft();
+                float currentRight = currentItem.getRight();
+                int currentItemWidth = (int) (currentRight - currentLeft);
+                if (currentItemWidth > tabWidth) {
+                    int currentMargin = (currentItemWidth - tabWidth) / 2;
+                    currentLeft = currentLeft + currentMargin;
+                    currentRight = currentRight - currentMargin;
+                }
+
+                if (mLinearGroup.getCacheLocalArray().size() > (tabIndex + 1)) {
+                    View nextItem = getItemView(tabIndex + 1);
+                    if (nextItem != null) {
+                        float nextLeft = nextItem.getLeft();
+                        float nextRight = nextItem.getRight();
+                        int nextItemWidth = (int) (nextRight - nextLeft);
+                        if (nextItemWidth > tabWidth) {
+                            int nextMargin = (nextItemWidth - tabWidth) / 2;
+                            nextLeft = nextLeft + nextMargin;
+                            nextRight = nextRight - nextMargin;
+                        }
+                        currentLeft = currentLeft + (nextLeft - currentLeft) * positionPercent;
+                        currentRight = currentRight + (nextRight - currentRight) * positionPercent;
+                    }
+                }
+                canvas.drawRect(currentLeft, getHeight() - tabHeight, currentRight, getHeight(), mTabPaint);
+            }
 
         }
     }

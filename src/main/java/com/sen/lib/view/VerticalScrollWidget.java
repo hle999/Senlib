@@ -46,6 +46,12 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
         return null;
     }
 
+    public void clearCacheItemsView() {
+        if (linearManager != null) {
+            linearManager.clearAllItems();
+        }
+    }
+
     /*@Override
     public void notifyDataChange() {
         if (linearManager != null) {

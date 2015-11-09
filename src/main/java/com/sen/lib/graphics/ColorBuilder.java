@@ -15,6 +15,13 @@ public class ColorBuilder {
         return rgb(v, v, v);
     }
 
+    public static int createGrey(int startColor, int endColor, float percen) {
+        int red = Color.red(startColor) + (int) ((Color.red(startColor) - Color.red(endColor)) * percen);
+        int green = Color.green(startColor) + (int) ((Color.green(startColor) - Color.green(endColor)) * percen);
+        int blue = Color.blue(startColor) + (int) ((Color.blue(startColor) - Color.blue(endColor)) * percen);
+        return rgb(red, green, blue);
+    }
+
     public static int rgb(int red, int green, int blue) {
         return Color.rgb(red, green, blue);
     }

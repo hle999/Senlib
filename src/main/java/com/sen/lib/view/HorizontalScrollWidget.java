@@ -48,6 +48,12 @@ public class HorizontalScrollWidget extends HorizontalScrollView implements Line
         return null;
     }
 
+    public void clearCacheItemsView() {
+        if (linearManager != null) {
+            linearManager.clearAllItems();
+        }
+    }
+
     /*@Override
     public void notifyDataChange() {
         if (linearManager != null) {
@@ -72,6 +78,14 @@ public class HorizontalScrollWidget extends HorizontalScrollView implements Line
         super.onScrollChanged(mScrollX, mScrollY, oldX, oldY);
         if (linearManager != null) {
             linearManager.onScrollChanged(mScrollX, mScrollY, oldX, oldY);
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        if (linearManager != null && changed) {
+            linearManager.setOriginSize(r - l - getPaddingLeft() - getPaddingRight(), b - t);
         }
     }
 
