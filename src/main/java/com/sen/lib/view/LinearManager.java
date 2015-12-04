@@ -55,6 +55,14 @@ class LinearManager implements IDataObserver {
         return adapter;
     }
 
+    public int getOriginWidth() {
+        return originWidth;
+    }
+
+    public int getOriginHeight() {
+        return originHeight;
+    }
+
     public ViewGroup getItemGroup() {
         return mLinearGroup;
     }
@@ -167,7 +175,7 @@ class LinearManager implements IDataObserver {
     private void resetHorizontalAllSize() {
         if (mLinearGroup != null && adapter != null) {
             int x = 0;
-            int leaveWidth = ((View)mLinearGroup.getParent()).getWidth();
+            int leaveWidth = originWidth;
             int maxHeight = 0;
             mLinearGroup.removeAllViews();
             mLinearGroup.setIncreaseNum(MAX_INCREASE_NUM);
@@ -203,7 +211,7 @@ class LinearManager implements IDataObserver {
     private void resetVerticalAllSize() {
         if (mLinearGroup != null && adapter != null) {
             int y = 0;
-            int leaveHeight = ((View)mLinearGroup.getParent()).getHeight();
+            int leaveHeight = originHeight;
             int maxWidth = 0;
             mLinearGroup.removeAllViews();
             mLinearGroup.setIncreaseNum(MAX_INCREASE_NUM);
@@ -240,8 +248,10 @@ class LinearManager implements IDataObserver {
         if (mLinearGroup != null) {
             if (adapter != null) {
 //                adapter.setDataObserver((IDataObserver) mLinearGroup.getParent());
-                if (lastAdapter != adapter || mLinearGroup.getCacheLocalArray() != null
-                        && mLinearGroup.getCacheLocalArray().size() == 0) {
+                if (lastAdapter != adapter
+                        || mLinearGroup.getCacheLocalArray() != null
+                        && (mLinearGroup.getCacheLocalArray().size() == 0
+                        || mLinearGroup.getCacheLocalArray().size() != adapter.getCount())) {
                     if (lastAdapter != adapter && lastAdapter != null) {
                         lastAdapter.setDataObserver(null);
                     }
@@ -384,8 +394,10 @@ class LinearManager implements IDataObserver {
         if (mLinearGroup != null) {
             if (adapter != null) {
 //                adapter.setDataObserver((IDataObserver) mLinearGroup.getParent());
-                if (lastAdapter != adapter || mLinearGroup.getCacheLocalArray() != null
-                        && mLinearGroup.getCacheLocalArray().size() == 0) {
+                if (lastAdapter != adapter
+                        || mLinearGroup.getCacheLocalArray() != null
+                        && (mLinearGroup.getCacheLocalArray().size() == 0
+                        || mLinearGroup.getCacheLocalArray().size() != adapter.getCount())) {
                     if (lastAdapter != adapter && lastAdapter != null) {
                         lastAdapter.setDataObserver(null);
                     }

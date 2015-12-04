@@ -46,6 +46,20 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
         return null;
     }
 
+    public int getOriginWidth() {
+        if (linearManager != null) {
+            return linearManager.getOriginWidth();
+        }
+        return 0;
+    }
+
+    public int getOriginHeight() {
+        if (linearManager != null) {
+            return linearManager.getOriginHeight();
+        }
+        return 0;
+    }
+
     public void clearCacheItemsView() {
         if (linearManager != null) {
             linearManager.clearAllItems();
@@ -80,12 +94,27 @@ public class VerticalScrollWidget extends ScrollView implements LinearManager.On
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        if (linearManager != null) {
+            if (width > (getPaddingLeft() + getPaddingRight())
+                    && height > (getPaddingTop() + getPaddingBottom())) {
+                linearManager.setOriginSize(width - getPaddingLeft() - getPaddingRight(), height - getPaddingTop() - getPaddingBottom());
+            } else {
+                throw new IllegalStateException("It's can not be (paddingLeft + paddingRihgt) > width or (paddingTop + paddingBottom) > height!");
+            }
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    /*@Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if (linearManager != null && changed) {
             linearManager.setOriginSize(r - l - getPaddingLeft() - getPaddingRight(), b - t);
         }
-    }
+    }*/
 
     @Override
     public void removeAllViews() {
