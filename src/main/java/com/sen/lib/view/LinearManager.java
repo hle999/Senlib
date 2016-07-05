@@ -20,6 +20,9 @@ class LinearManager implements IDataObserver {
     private int originWidth;
     private int originHeight;
 
+    private int mScrollX;
+    private int mScrollY;
+
     private OnLinearManagerListener onLinearManagerListener;
 
     public void setOnLinearManagerListener(OnLinearManagerListener onLinearManagerListener) {
@@ -107,6 +110,10 @@ class LinearManager implements IDataObserver {
     }
 
     public void onScrollChanged(int mScrollX, int mScrollY, int oldX, int oldY) {
+
+        this.mScrollX = mScrollX;
+        this.mScrollY = mScrollY;
+
         if (mLinearGroup != null) {
             if (mLinearGroup.getOrientation() == LinearGroup.VERTICAL) {
                 if (mScrollY > oldY) {
@@ -249,15 +256,15 @@ class LinearManager implements IDataObserver {
             if (adapter != null) {
 //                adapter.setDataObserver((IDataObserver) mLinearGroup.getParent());
                 if (lastAdapter != adapter
-                        || mLinearGroup.getCacheLocalArray() != null
-                        && (mLinearGroup.getCacheLocalArray().size() == 0
-                        || mLinearGroup.getCacheLocalArray().size() != adapter.getCount())) {
+                        || (mLinearGroup.getCacheLocalArray() != null
+                        && mLinearGroup.getCacheLocalArray().size() == 0)) {
                     if (lastAdapter != adapter && lastAdapter != null) {
                         lastAdapter.setDataObserver(null);
                     }
                     lastAdapter = adapter;
                     resetHorizontalAllSize();
-                } else {
+                } else if (mLinearGroup.getCacheLocalArray() != null
+                        && mLinearGroup.getCacheLocalArray().size() != adapter.getCount()) {
                     changeHorizontalSize();
                     /*int x = 0;
                     int leaveWidth = originWidth;
@@ -395,15 +402,15 @@ class LinearManager implements IDataObserver {
             if (adapter != null) {
 //                adapter.setDataObserver((IDataObserver) mLinearGroup.getParent());
                 if (lastAdapter != adapter
-                        || mLinearGroup.getCacheLocalArray() != null
-                        && (mLinearGroup.getCacheLocalArray().size() == 0
-                        || mLinearGroup.getCacheLocalArray().size() != adapter.getCount())) {
+                        || (mLinearGroup.getCacheLocalArray() != null
+                        && mLinearGroup.getCacheLocalArray().size() == 0)) {
                     if (lastAdapter != adapter && lastAdapter != null) {
                         lastAdapter.setDataObserver(null);
                     }
                     lastAdapter = adapter;
                     resetVerticalAllSize();
-                } else {
+                } else if (mLinearGroup.getCacheLocalArray() != null
+                        && mLinearGroup.getCacheLocalArray().size() != adapter.getCount()) {
                     changeVerticalSize();
                     /*int y = 0;
                     int leaveHeight = originHeight;

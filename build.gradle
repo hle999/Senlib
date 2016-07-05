@@ -2,10 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 // This is the library version used when deploying the artifact
-version = "1.0.29"
+version = "1.0.30"
 android {
     compileSdkVersion 19
-    buildToolsVersion "20.0.0"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 10
@@ -37,7 +37,7 @@ dependencies {
 def siteUrl = 'https://github.com/hle999/Senlib'
 def gitUrl = 'https://github.com/hle999/Senlib.git'
 
-group = "com.sen.lib" // Maven Group ID for the artifact£¬Ò»°ãÌîÄãÎ¨Ò»µÄ°üÃû
+group = "com.sen.lib" // Maven Group ID for the artifactï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¨Ò»ï¿½Ä°ï¿½ï¿½ï¿½
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -45,7 +45,7 @@ install {
             project {
                 packaging 'aar'
                 // Add your description here
-                name 'Android extra library' 	//ÏîÄ¿ÃèÊö
+                name 'Android extra library' 	//ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½
                 url siteUrl
                 // Set your license
                 licenses {
@@ -56,7 +56,7 @@ install {
                 }
                 developers {
                     developer {
-                        id 'hle999'		//ÌîÐ´µÄÒ»Ð©»ù±¾ÐÅÏ¢
+                        id 'hle999'		//ï¿½ï¿½Ð´ï¿½ï¿½Ò»Ð©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
                         name 'Extra'
                         email 'hle999@126.com'
                     }
@@ -94,7 +94,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"
-        name = "SenAndroidExtraLibrary"	//·¢²¼µ½JCenterÉÏµÄÏîÄ¿Ãû×Ö
+        name = "SenAndroidExtraLibrary"	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½JCenterï¿½Ïµï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]

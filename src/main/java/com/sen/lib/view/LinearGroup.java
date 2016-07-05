@@ -84,6 +84,13 @@ public class LinearGroup extends ViewGroup {
         return false;
     }
 
+    public int getCacheViewInfoArrayCount() {
+        if (mCacheViewInfoArray != null) {
+            return mCacheViewInfoArray.size();
+        }
+        return 0;
+    }
+
     public boolean addCacheViewInfo(int index, CacheViewInfo cacheViewInfo) {
         if (mCacheViewInfoArray != null && cacheViewInfo != null) {
             mCacheViewInfoArray.add(index, cacheViewInfo);
